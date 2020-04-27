@@ -7,21 +7,26 @@ public class RatMove : MonoBehaviour
     public float speed = 3.0f;
     private float count = 0;
     private float randomZ;
+    PlayerController pcScript;
     // Start is called before the first frame update
     void Start()
     {
         randomZ = Random.Range(-1.0f, 1.0f);
+        GameObject Player = GameObject.Find("Sphere");
+        pcScript = Player.GetComponent<PlayerController>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-        if (count < 2)
+        if (!pcScript.gameOver)
         {
-            transform.Translate(new Vector3(-Mathf.Sqrt(2), 0, randomZ) * Time.deltaTime * speed);
-            count += Time.deltaTime;
+            if (count < 2)
+            {
+                transform.Translate(new Vector3(-Mathf.Sqrt(2), 0, randomZ) * Time.deltaTime * speed);
+                count += Time.deltaTime;
+            }
+            else transform.Translate(Vector3.left * Time.deltaTime * speed);
         }
-        else transform.Translate(Vector3.left * Time.deltaTime * speed);
     }
 }

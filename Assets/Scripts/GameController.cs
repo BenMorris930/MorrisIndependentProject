@@ -9,12 +9,14 @@ public class GameController : MonoBehaviour
     private Rigidbody rb;
     public GameObject[] ratPrefab = new GameObject[3];
     public int i = 0;
+    PlayerController pcScript;
 
     void Start()
     {
-        rb = Player.GetComponent<Rigidbody>();
+
         InvokeRepeating("RatSpawn", 1, 1);
-        
+        GameObject Player = GameObject.Find("Sphere");
+        pcScript = Player.GetComponent<PlayerController>();
     }
 
     void Update()
@@ -24,14 +26,18 @@ public class GameController : MonoBehaviour
 
     void RatSpawn()
     {
-        Instantiate(ratPrefab[i], ratPrefab[i].transform.position, ratPrefab[i].transform.rotation);
-        i = (i + 1) % ratPrefab.Length;
+        if (!pcScript.gameOver)
+        {
+            Instantiate(ratPrefab[i], ratPrefab[i].transform.position, ratPrefab[i].transform.rotation);
+            i = (i + 1) % ratPrefab.Length;
+        }
     }
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Kill"))
         {
-            Player.transform.position = SpawnPoint.transform.position;
+            //Player.transform.position = SpawnPoint.transform.position;
+            pcScript.gameOver = true;
         }
 
     }

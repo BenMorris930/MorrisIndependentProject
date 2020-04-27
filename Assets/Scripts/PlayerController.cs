@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     private bool isSlimed;
     private bool jumpBuff;
     private bool allCollected;
+    public bool gameOver = false;
     private Vector3 jump = new Vector3(0.0f, 1.0f, 0.0f);
     private Vector3 respawn = new Vector3(0, 0.26f, 0);
     public GameObject CameraPivot;
@@ -27,10 +28,14 @@ public class PlayerController : MonoBehaviour
     public GameObject Fan;
     public GameObject Powerup;
     public Transform StartPoint;
+    public ParticleSystem playerExplosion;
+    public AudioClip explosionAudio;
+    private AudioSource audioSource;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        audioSource = GetComponent<AudioSource>();
         count = 0;
         SetCountText();
         winText.text = "";
@@ -73,7 +78,7 @@ public class PlayerController : MonoBehaviour
         {
             rb.AddForce(relativeMovement * 0.1f * speed, ForceMode.Force);
         }
-        else
+        else if (!gameOver)
         {
             rb.AddForce(relativeMovement * speed, ForceMode.Force);
         }
@@ -85,6 +90,14 @@ public class PlayerController : MonoBehaviour
         float moveVertical = Input.GetAxis("Vertical");
         Vector3 slimeJump = new Vector3(moveHorizontal, 1.0f, moveVertical);
         Vector3 relativeSlimeJump = CameraPivot.transform.TransformVector(slimeJump);
+
+        if (gameOver)
+        {
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.useGravity = false;
+            
+        }
 
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded && isSlimed)
         {
@@ -100,7 +113,7 @@ public class PlayerController : MonoBehaviour
             jumpBuff = false;
         }
 
-        else if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        else if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !gameOver)
         {
             rb.AddForce(jump * jumpheight, ForceMode.Impulse);
             isGrounded = false;
@@ -159,9 +172,12 @@ public class PlayerController : MonoBehaviour
 
         if (other.gameObject.CompareTag("Kill"))
         {
-            transform.position = respawn;
+            //transform.position = respawn;
+            gameOver = true;
             rb.velocity = new Vector3(0, 0, 0);
             rb.angularVelocity = new Vector3(0, 0, 0);
+            playerExplosion.Play();
+            audioSource.PlayOneShot(explosionAudio, 1.5f);
         }
     }
 
