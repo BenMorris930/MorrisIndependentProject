@@ -23,10 +23,10 @@ public class RatMove : MonoBehaviour
         {
             if (count < 2)
             {
-                transform.Translate(new Vector3(-Mathf.Sqrt(2), 0, randomZ) * Time.deltaTime * speed);
+                transform.Translate(new Vector3(randomZ, 0, Mathf.Sqrt(2)) * Time.deltaTime * speed);
                 count += Time.deltaTime;
             }
-            else transform.Translate(Vector3.left * Time.deltaTime * speed);
+            else transform.Translate(Vector3.forward * Time.deltaTime * speed);
         }
     }
 }
