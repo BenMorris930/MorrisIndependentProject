@@ -7,9 +7,12 @@ public class CameraControl : MonoBehaviour
     public GameObject player;
     public float mouseSens;
     private Vector3 offset;
+    PlayerController pcScript;
 
     void Start()
     {
+        GameObject Player = GameObject.Find("Sphere");
+        pcScript = Player.GetComponent<PlayerController>();
         offset = transform.position - player.transform.position;
     }
 
@@ -22,15 +25,17 @@ public class CameraControl : MonoBehaviour
     {
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = Input.GetAxis("Mouse Y");
-
-        if (mouseX < 0.0)
+        if(!pcScript.gameOver)
         {
-            transform.Rotate(0.0f, -1.0f*mouseSens, 0.0f);
-        }
+            if (mouseX < 0.0)
+            {
+                transform.Rotate(0.0f, -1.0f * mouseSens, 0.0f);
+            }
 
-        if (mouseX > 0.0)
-        {
-            transform.Rotate(0.0f, 1.0f*mouseSens, 0.0f);
+            if (mouseX > 0.0)
+            {
+                transform.Rotate(0.0f, 1.0f * mouseSens, 0.0f);
+            }
         }
 
     }

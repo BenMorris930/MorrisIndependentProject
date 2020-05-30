@@ -33,7 +33,6 @@ public class BirdMove : MonoBehaviour
             }
         }
         if (count >= 2) count = 0;
-        Debug.Log(count);
-        if (transform.position.z > 6) Destroy(gameObject);
+        if (transform.position.z < -8) Destroy(gameObject);
     }
 }

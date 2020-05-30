@@ -13,7 +13,7 @@ public class GameController : MonoBehaviour
     PlayerController pcScript;
     public int waveNumber = 1;
     private int enemyCount;
-    public float randRange = 0.01f;
+    public float randRange = 5f;
     private int numberEnemies;
     private GameObject birdSpawn;
     private AudioSource audioSource;
@@ -53,15 +53,17 @@ public class GameController : MonoBehaviour
     {
         float spawnX = Random.Range(-randRange, randRange);
         float spawnY = Random.Range(-randRange, randRange);
-        Vector3 pos = new Vector3(spawnX, spawnY, 0) + birdSpawn.transform.position;
-        return pos;
+        return new Vector3(spawnX, spawnY, 0) + birdSpawn.transform.position;
+
     }
 
     void BirdSpawn(int numberEnemies)
     {
         for (int en = 0; en < numberEnemies; en++)
         {
-            Instantiate(birdPrefab, RandomSpawn(), birdPrefab.transform.rotation);
+            Vector3 spawnPosition = RandomSpawn();
+            Debug.Log(spawnPosition);
+            Instantiate(birdPrefab, spawnPosition, birdPrefab.transform.rotation);
         }
     }
 

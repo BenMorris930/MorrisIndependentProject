@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class PlayerController : MonoBehaviour
     public float jumpheight;
     public float buff;
     public float fanStrength;
+    public float timeLeft = 45;
     public Text countText;
     public Text winText;
     public Text restartText;
@@ -20,13 +22,23 @@ public class PlayerController : MonoBehaviour
     private bool isSlimed;
     private bool jumpBuff;
     private bool allCollected;
-    public bool gameOver = false;
+    public bool gameOver = true;
+    public bool isWon = false;
+    public bool endGame = false;
     private Vector3 jump = new Vector3(0.0f, 1.0f, 0.0f);
     private Vector3 respawn = new Vector3(0, 0.26f, 0);
     public GameObject CameraPivot;
     public ParticleSystem goalLight;
-    public GameObject Fan;
-    public GameObject Powerup;
+
+    public TextMeshProUGUI gameoverText;
+    public TextMeshProUGUI victoryText;
+    public TextMeshProUGUI timerText;
+    public TextMeshProUGUI titleText;
+    public TextMeshProUGUI descText;
+    public Button restartButton;
+    public Button startButton;
+
+
     public Transform StartPoint;
     public ParticleSystem playerExplosion;
     public AudioClip explosionAudio;
@@ -51,9 +63,23 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Ground"))
             isGrounded = true;
-        Powerup.SetActive(true);
     }
 
+    public void StartGame()
+    {
+        gameOver = false;
+        titleText.gameObject.SetActive(false);
+        descText.gameObject.SetActive(false);
+        startButton.gameObject.SetActive(false);
+        rb.useGravity = true;
+        
+    }
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+    
     private void OnCollisionExit()
     {
         if (isSlimed == true)
@@ -91,12 +117,33 @@ public class PlayerController : MonoBehaviour
         Vector3 slimeJump = new Vector3(moveHorizontal, 1.0f, moveVertical);
         Vector3 relativeSlimeJump = CameraPivot.transform.TransformVector(slimeJump);
 
+        if (!gameOver)
+        {
+            timeLeft = timeLeft - Time.deltaTime;
+            timerText.text = "Time Left: " + Mathf.Round(timeLeft);
+        }
+        
+        if (timeLeft <= 0)
+        {
+            gameOver = true;
+            endGame = true;
+        }
         if (gameOver)
         {
             rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
             rb.useGravity = false;
             
+        }
+        if (isWon)
+        {
+            victoryText.gameObject.SetActive(true);
+            restartButton.gameObject.SetActive(true);
+        }
+        if (endGame)
+        {
+            gameoverText.gameObject.SetActive(true);
+            restartButton.gameObject.SetActive(true);
         }
 
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded && isSlimed)
@@ -129,11 +176,19 @@ public class PlayerController : MonoBehaviour
             Application.Quit();
         }
 
-            Fan.transform.Rotate(0.0f, -10.0f, 0.0f);
     }
 
     void OnTriggerEnter(Collider other)
     {
+        if (other.gameObject.CompareTag("Goal"))
+        {
+            isWon = true;
+            gameOver = true;
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.useGravity = false;
+        }
+
         if (other.gameObject.CompareTag("Pick Up"))
         {
             other.gameObject.SetActive(false);
@@ -174,6 +229,7 @@ public class PlayerController : MonoBehaviour
         {
             //transform.position = respawn;
             gameOver = true;
+            endGame = true;
             rb.velocity = new Vector3(0, 0, 0);
             rb.angularVelocity = new Vector3(0, 0, 0);
             playerExplosion.Play();
